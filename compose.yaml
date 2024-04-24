@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: veetro
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    ports:
+      - 27017
+
+  backend:
+    depends_on:
+      - db
+    image: veetro
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      MONGO_URL: "mongodb://mongodb:27017/?retryWrites=true&w=majority"
