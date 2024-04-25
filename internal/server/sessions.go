@@ -15,7 +15,7 @@ type session struct {
 	storage.User
 }
 type sessions struct {
-	mu       sync.Locker
+	mu       sync.Mutex
 	sessions []session
 }
 
