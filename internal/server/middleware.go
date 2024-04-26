@@ -17,34 +17,28 @@ func corsMid(n http.Handler) http.Handler {
 		n.ServeHTTP(w, r)
 	})
 }
-func EmployeeOnly(c *CustomContext) (bool, *ResponseStatus) {
+func EmployeeOnly(c *CustomContext) (bool, int, *response) {
 	if c.Session.Employee {
-		return true, nil
+		return true, 0, nil
 	}
-	res := &ResponseStatus{}
-	res.Code = http.StatusUnauthorized
-	res.Error = "Only for Employees"
-	return false, res
+	return false, http.StatusUnauthorized, &response{Error: "Only for Employees"}
 }
-func CustomerOnly(c *CustomContext) (bool, *ResponseStatus) {
+func CustomerOnly(c *CustomContext) (bool, int, *response) {
 	if c.Session.Customer {
-		return true, nil
+		return true, 0, nil
 	}
-	res := &ResponseStatus{}
-	res.Code = http.StatusUnauthorized
-	res.Error = "Only for customers"
-	return false, res
+	return false, http.StatusUnauthorized, &response{Error: "Only for customers"}
 }
-func Auth(c *CustomContext) (bool, *ResponseStatus) {
+func Auth(c *CustomContext) (bool, int, *response) {
 	sessionStr, is := getSessionIdFromHeader(c.Request)
 	if is {
 		session, found := c.Sessions.GetSession(sessionStr)
 		if found && session.Valid {
 			c.Session = session
-			return true, nil
+			return true, 0, nil
 		}
 	}
-	return false, &ResponseStatus{Code: http.StatusForbidden, Error: "Forbidden"}
+	return false, http.StatusForbidden, &response{Error: "Forbidden"}
 }
 func getSessionIdFromHeader(r *http.Request) (string, bool) {
 	sessionSplit := strings.Split(r.Header.Get("Authorization"), " ")

@@ -15,7 +15,7 @@ func employeeApplications(c *s.CustomContext) error {
 		if err != nil {
 			return err
 		}
-		return s.ResponseJSON(c.Writer, 200, offs)
+		return s.ResponseJSON(c.Writer, "success", offs)
 	case "POST":
 		appl := &storage.Application{}
 		if err := json.NewDecoder(c.Request.Body).Decode(appl); err != nil {
@@ -48,7 +48,7 @@ func employeeApplications(c *s.CustomContext) error {
 		if err := c.Storage.CreateApplication(appl); err != nil {
 			return err
 		}
-		return s.ResponseJSON(c.Writer, 200, appl)
+		return s.ResponseJSON(c.Writer, "Application Created", appl)
 	case "DELETE":
 		ids := &[]string{}
 		if err := json.NewDecoder(c.Request.Body).Decode(ids); err != nil {
@@ -64,7 +64,7 @@ func employeeApplications(c *s.CustomContext) error {
 		if dc == 0 {
 			return s.ResponseBadJSON(c.Writer, "nothing to delete", nil)
 		}
-		return s.ResponseJSON(c.Writer, 200, &s.ResponseStatus{Code: 200, Message: fmt.Sprintf("%d applications deleted", dc)})
+		return s.ResponseJSON(c.Writer, fmt.Sprintf("%d applications deleted", dc), nil)
 	}
 	return nil
 }
@@ -79,7 +79,7 @@ func employeeApplication(c *s.CustomContext) error {
 		if !is {
 			return s.ResponseBadJSON(c.Writer, "application not exists", nil)
 		}
-		return s.ResponseJSON(c.Writer, 200, appl)
+		return s.ResponseJSON(c.Writer, "success", appl)
 	case "PUT":
 		a := &storage.Application{}
 		if err := json.NewDecoder(c.Request.Body).Decode(a); err != nil {
@@ -106,7 +106,7 @@ func employeeApplication(c *s.CustomContext) error {
 		if err != nil {
 			return err
 		}
-		return s.ResponseJSON(c.Writer, 200, a)
+		return s.ResponseJSON(c.Writer, "application "+app_id+" updated", a)
 	case "DELETE":
 		is, err := c.Storage.DeleteApplication(app_id, "", c.Session.Id)
 		if err != nil {

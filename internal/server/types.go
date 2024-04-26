@@ -10,12 +10,13 @@ type CustomContext struct {
 	Session *session
 	*Server
 }
-type ResponseStatus struct {
-	Code    int      `json:"code,omitempty"`
+type response struct {
+	Success bool     `json:"success"`
 	Message string   `json:"message,omitempty"`
 	Error   string   `json:"error,omitempty"`
-	Errs    []string `json:"errs,omitempty"`
+	Data    any      `json:"data,omitempty"`
+	Errors  []string `json:"errors,omitempty"`
 }
 
-type CustomMW func(c *CustomContext) (bool, *ResponseStatus)
+type CustomMW func(c *CustomContext) (bool, int, *response)
 type CustomHandlerFunc func(c *CustomContext) error

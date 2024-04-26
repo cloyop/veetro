@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"net/http"
 
 	s "github.com/cloyop/veetro/internal/server"
 	"github.com/cloyop/veetro/internal/storage"
@@ -22,13 +21,13 @@ func login(c *s.CustomContext) error {
 	}
 	ses := c.Sessions.NewSession(u)
 	u.Password = ""
-	return s.ResponseJSON(c.Writer, http.StatusOK, &map[string]interface{}{"user": u, "token": ses.SessionId, "code": 200})
+	return s.ResponseJSON(c.Writer, "success", &map[string]interface{}{"user": u, "token": ses.SessionId})
 }
 func logout(c *s.CustomContext) error {
 	if !c.Sessions.RemoveSession(c.Session.SessionId) {
 		return s.ResponseBadJSON(c.Writer, "cant found session", nil)
 	}
-	return s.ResponseJSON(c.Writer, http.StatusOK, &s.ResponseStatus{Code: 200})
+	return s.ResponseJSON(c.Writer, "success", nil)
 }
 func signup(c *s.CustomContext) error {
 	sreq := &storage.User{}
@@ -54,5 +53,5 @@ func signup(c *s.CustomContext) error {
 	}
 	ses := c.Sessions.NewSession(u)
 	u.Password = ""
-	return s.ResponseJSON(c.Writer, http.StatusOK, &map[string]interface{}{"user": u, "token": ses.SessionId, "code": 200})
+	return s.ResponseJSON(c.Writer, "success", &map[string]interface{}{"user": u, "token": ses.SessionId})
 }

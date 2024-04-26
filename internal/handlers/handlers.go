@@ -7,11 +7,6 @@ import (
 	"github.com/cloyop/veetro/internal/storage"
 )
 
-type OfferResponse struct {
-	storage.Offer `json:"offer"`
-	s.ResponseStatus
-}
-
 func LoadHandlers(srv *s.Server) {
 
 	srv.Handle("/user/up", signup, "POST")
@@ -40,13 +35,13 @@ func user(c *s.CustomContext) error {
 			if err != nil {
 				return err
 			}
-			return s.ResponseJSON(c.Writer, 200, &map[string]interface{}{"user": u, "applications": aps})
+			return s.ResponseJSON(c.Writer, "success", &map[string]interface{}{"user": u, "applications": aps})
 		}
 		ofs, err := c.Storage.GetAllOffersWithApplications(u.Id)
 		if err != nil {
 			return err
 		}
-		return s.ResponseJSON(c.Writer, 200, &map[string]interface{}{"user": u, "offers": ofs})
+		return s.ResponseJSON(c.Writer, "success", &map[string]interface{}{"user": u, "offers": ofs})
 	case "PUT":
 		u := &storage.User{}
 		if err := json.NewDecoder(c.Request.Body).Decode(u); err != nil {
@@ -69,7 +64,7 @@ func user(c *s.CustomContext) error {
 		u, _, _ = c.Storage.GetUserByEmail(c.Session.Email)
 		c.Session.User = *u
 		u.Password = ""
-		return s.ResponseJSON(c.Writer, 200, u)
+		return s.ResponseJSON(c.Writer, "user "+u.Id+" updated", u)
 	case "DELETE":
 		var success bool
 		if c.Session.Customer {
@@ -90,7 +85,7 @@ func user(c *s.CustomContext) error {
 			return s.ResponseBadJSON(c.Writer, "user not delete", nil)
 		}
 		c.Sessions.RemoveSession(c.Session.SessionId)
-		return s.ResponseJSON(c.Writer, 200, &s.ResponseStatus{Code: 200, Message: "user deleted"})
+		return s.ResponseJSON(c.Writer, "user "+c.Session.Id+" deleted", nil)
 	}
 	return nil
 }

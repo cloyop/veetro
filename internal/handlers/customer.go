@@ -16,7 +16,7 @@ func customerOffers(c *s.CustomContext) error {
 		if err != nil {
 			return err
 		}
-		return s.ResponseJSON(c.Writer, http.StatusOK, offers)
+		return s.ResponseJSON(c.Writer, "success", offers)
 	case "POST":
 		offerR := &storage.Offer{}
 		if err := json.NewDecoder(c.Request.Body).Decode(&offerR); err != nil {
@@ -32,7 +32,7 @@ func customerOffers(c *s.CustomContext) error {
 		if offerR.Open {
 			c.State.Change(true)
 		}
-		return s.ResponseJSON(c.Writer, http.StatusOK, offerR)
+		return s.ResponseJSON(c.Writer, "Offer created", offerR)
 	case "DELETE":
 		offersIds := &[]string{}
 		if err := json.NewDecoder(c.Request.Body).Decode(offersIds); err != nil {
@@ -64,7 +64,7 @@ func customerOffer(c *s.CustomContext) error {
 		if !is {
 			return s.ResponseBadJSON(c.Writer, "offer not Found", nil)
 		}
-		return s.ResponseJSON(c.Writer, http.StatusOK, offer)
+		return s.ResponseJSON(c.Writer, "success", offer)
 	case "PUT":
 		o := &storage.Offer{}
 		if err := json.NewDecoder(c.Request.Body).Decode(o); err != nil {
@@ -103,7 +103,7 @@ func customerOffer(c *s.CustomContext) error {
 		if ChangeOpen {
 			c.State.Change(true)
 		}
-		return s.ResponseJSON(c.Writer, 200, o)
+		return s.ResponseJSON(c.Writer, "offer "+o.Id+" updated", o)
 	case "DELETE":
 		sucess, err := c.Storage.DeleteOffer(offerId, c.Session.Id)
 		if err != nil {
@@ -113,7 +113,7 @@ func customerOffer(c *s.CustomContext) error {
 			return s.ResponseBadJSON(c.Writer, "offer not found", nil)
 		}
 		c.State.Change(true)
-		return s.ResponseJSON(c.Writer, http.StatusOK, &s.ResponseStatus{Code: 200, Message: "Deleted Sucessfully"})
+		return s.ResponseJSON(c.Writer, "Offer Deleted", nil)
 	}
 	return nil
 }
@@ -123,7 +123,7 @@ func customerOfferApplications(c *s.CustomContext) error {
 	if err != nil {
 		return err
 	}
-	return s.ResponseJSON(c.Writer, 200, appl)
+	return s.ResponseJSON(c.Writer, "success", appl)
 }
 func customerOfferApplication(c *s.CustomContext) error {
 	offerId := c.Request.PathValue("offer_id")
@@ -137,7 +137,7 @@ func customerOfferApplication(c *s.CustomContext) error {
 		if !is {
 			return s.ResponseBadJSON(c.Writer, "application not found", nil)
 		}
-		return s.ResponseJSON(c.Writer, 200, appl)
+		return s.ResponseJSON(c.Writer, "success", appl)
 	case "DELETE":
 		success, err := c.Storage.DeleteApplication(ApplyId, offerId, "")
 		if err != nil {

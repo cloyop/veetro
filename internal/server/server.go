@@ -44,8 +44,9 @@ func (s *Server) h(f CustomHandlerFunc, methods string, mws ...CustomMW) http.Ha
 		}
 		ctx := &CustomContext{Writer: w, Request: r, Server: s}
 		for _, mw := range mws {
-			if success, res := mw(ctx); !success {
-				ResponseJSON(w, res.Code, res)
+			if success, code, res := mw(ctx); !success {
+				w.WriteHeader(code)
+				json.NewEncoder(w).Encode(res)
 				return
 			}
 		}
@@ -57,20 +58,24 @@ func (s *Server) h(f CustomHandlerFunc, methods string, mws ...CustomMW) http.Ha
 	}
 }
 
-func ResponseJSON(w http.ResponseWriter, status int, v any) error {
-	bytes, err := json.Marshal(v)
+func ResponseJSON(w http.ResponseWriter, m string, v any) error {
+	r := &response{Success: true, Message: m}
+	if v != nil {
+		r.Data = v
+	}
+	bytes, err := json.Marshal(r)
 	if err != nil {
 		return err
 	}
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(status)
+	w.WriteHeader(200)
 	_, err = w.Write(bytes)
 	return err
 }
 func ResponseBadJSON(w http.ResponseWriter, e string, errs *[]string) error {
-	r := &ResponseStatus{Error: "Bad Request", Code: 400}
+	r := &response{Error: "Bad Request"}
 	if errs != nil && len(*errs) > 0 {
-		r.Errs = *errs
+		r.Errors = *errs
 	}
 	if e != "" {
 		r.Error = e
@@ -86,7 +91,7 @@ func ResponseBadJSON(w http.ResponseWriter, e string, errs *[]string) error {
 }
 func ResponseErrInternalSrv(w http.ResponseWriter) {
 	w.WriteHeader(500)
-	if err := json.NewEncoder(w).Encode(&ResponseStatus{Code: 500, Error: "Internal Error"}); err != nil {
+	if err := json.NewEncoder(w).Encode(&response{Error: "Internal Error"}); err != nil {
 		fmt.Println(err)
 	}
 }
