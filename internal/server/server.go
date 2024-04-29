@@ -11,7 +11,7 @@ import (
 )
 
 type Server struct {
-	State      *state
+	OpenOrders int
 	listenAddr string
 	Sessions   *sessions
 	router     *http.ServeMux
@@ -24,7 +24,6 @@ func New(ln string, s storage.StorageService) *Server {
 		Sessions:   &sessions{},
 		listenAddr: ln,
 		Storage:    s,
-		State:      &state{changed: true},
 	}
 }
 func (s *Server) Run() error {
@@ -57,7 +56,6 @@ func (s *Server) h(f CustomHandlerFunc, methods string, mws ...CustomMW) http.Ha
 		}
 	}
 }
-
 func ResponseJSON(w http.ResponseWriter, m string, v any) error {
 	r := &response{Success: true, Message: m}
 	if v != nil {

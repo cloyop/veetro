@@ -29,9 +29,6 @@ func customerOffers(c *s.CustomContext) error {
 		if err := c.Storage.CreateOffer(offerR); err != nil {
 			return err
 		}
-		if offerR.Open {
-			c.State.Change(true)
-		}
 		return s.ResponseJSON(c.Writer, "Offer created", offerR)
 	case "DELETE":
 		offersIds := &[]string{}
@@ -48,7 +45,6 @@ func customerOffers(c *s.CustomContext) error {
 		if quantity == 0 {
 			return s.ResponseBadJSON(c.Writer, "nothing to delete", nil)
 		}
-		c.State.Change(true)
 		return s.ResponseBadJSON(c.Writer, fmt.Sprintf("%d offers deleted", quantity), nil)
 	}
 	return nil
@@ -74,14 +70,12 @@ func customerOffer(c *s.CustomContext) error {
 		if len(*errs) > 0 {
 			return s.ResponseBadJSON(c.Writer, "", errs)
 		}
-		var ChangeOpen bool
 		if isOpen := c.Request.URL.Query().Get("open"); isOpen == "true" || isOpen == "false" {
 			if isOpen == "true" {
 				filters["open"] = true
 			} else {
 				filters["open"] = false
 			}
-			ChangeOpen = true
 		}
 		if len(filters) == 0 {
 			return s.ResponseBadJSON(c.Writer, "missing fields", nil)
@@ -100,9 +94,6 @@ func customerOffer(c *s.CustomContext) error {
 		if err != nil {
 			return err
 		}
-		if ChangeOpen {
-			c.State.Change(true)
-		}
 		return s.ResponseJSON(c.Writer, "offer "+o.Id+" updated", o)
 	case "DELETE":
 		sucess, err := c.Storage.DeleteOffer(offerId, c.Session.Id)
@@ -112,7 +103,6 @@ func customerOffer(c *s.CustomContext) error {
 		if !sucess {
 			return s.ResponseBadJSON(c.Writer, "offer not found", nil)
 		}
-		c.State.Change(true)
 		return s.ResponseJSON(c.Writer, "Offer Deleted", nil)
 	}
 	return nil

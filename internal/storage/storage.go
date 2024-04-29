@@ -19,7 +19,7 @@ type offerStorageService interface {
 	GetOfferWithApplications(offerId, userId string) (*Offer, bool, error)
 	GetAllOffersWithApplications(userId string) (*[]Offer, error)
 	// With Filters
-	GetAllOffers(keyword, role, location string) (*[]Offer, error)
+	GetAllOffers(keyword, role, location string, page int) (*[]Offer, int64, error)
 	GetOffer(offerId string) (*Offer, bool, error)
 	//
 	OfferExist(string) (bool, error)

@@ -73,7 +73,6 @@ func user(c *s.CustomContext) error {
 				return err
 			}
 			success = sc
-			c.State.Change(true)
 		} else {
 			sc, err := c.Storage.DeleteEmployee(c.Session.Id)
 			if err != nil {

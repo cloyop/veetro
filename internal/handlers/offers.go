@@ -1,23 +1,26 @@
 package handlers
 
 import (
+	"strconv"
+
 	"github.com/cloyop/veetro/internal/server"
 )
 
 func offersHandler(c *server.CustomContext) error {
 	q := c.Request.URL.Query()
-	fsize := len(q)
-	if fsize == 0 && !c.State.HasChanged() {
-		return server.ResponseJSON(c.Writer, "success", &map[string]interface{}{"offers": c.State.CurrentOffers(), "totalOffers": c.State.OpenOffers()})
+	page := 1
+	if pageStr := q.Get("page"); pageStr != "" {
+		pint, err := strconv.Atoi(pageStr)
+		if err != nil || pint < 1 {
+			return server.ResponseBadJSON(c.Writer, "Invalid Pagination Param", nil)
+		}
+		page = pint
 	}
-	offers, err := c.Storage.GetAllOffers(q.Get("keyword"), q.Get("role"), q.Get("location"))
+	offers, n, err := c.Storage.GetAllOffers(q.Get("keyword"), q.Get("role"), q.Get("location"), page)
 	if err != nil {
 		return err
 	}
-	if fsize == 0 && c.State.HasChanged() {
-		c.State.UpdateOpenOffers(offers)
-	}
-	return server.ResponseJSON(c.Writer, "success", &map[string]interface{}{"offers": offers, "totalOffers": c.State.OpenOffers()})
+	return server.ResponseJSON(c.Writer, "success", &map[string]interface{}{"offers": offers, "totalOffers": n})
 }
 func offerHandler(c *server.CustomContext) error {
 	Offerid := c.Request.PathValue("offer_id")

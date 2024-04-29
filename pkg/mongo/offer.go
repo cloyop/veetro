@@ -14,7 +14,7 @@ func (s *MongoStorage) GetOffer(offerId string) (*storage.Offer, bool, error) {
 	is, err := getOne(s.mongoDB.Collection("offers"), filter, o, nil)
 	return o, is, err
 }
-func (s *MongoStorage) GetAllOffers(keyword, role, location string) (*[]storage.Offer, error) {
+func (s *MongoStorage) GetAllOffers(keyword, role, location string, page int) (*[]storage.Offer, int64, error) {
 	f := bson.D{{Key: "open", Value: true}}
 	insensitiveK := bson.E{Key: "$options", Value: "i"}
 	if keyword != "" {
@@ -26,8 +26,10 @@ func (s *MongoStorage) GetAllOffers(keyword, role, location string) (*[]storage.
 	if location != "" {
 		f = append(f, bson.E{Key: "location", Value: bson.D{{Key: "$regex", Value: location}, insensitiveK}})
 	}
+	n, _ := howManyDocs(s.mongoDB.Collection("offers"), f)
 	offers := &[]storage.Offer{}
-	return offers, getAllOffers(s.mongoDB.Collection("offers"), f, offers, nil)
+	options := options.Find().SetLimit(50).SetSkip(int64((page - 1) * 50))
+	return offers, n, getAllOffers(s.mongoDB.Collection("offers"), f, offers, options)
 }
 func (s *MongoStorage) GetAllOffersWithApplications(userId string) (*[]storage.Offer, error) {
 	ofs := &[]storage.Offer{}
