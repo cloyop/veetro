@@ -41,10 +41,10 @@ func employeeApplications(c *s.CustomContext) error {
 			}
 			appl.Resume = c.Session.Resume
 		}
-		if appl.EmployeeLocation == "" {
-			appl.EmployeeLocation = c.Session.Location
+		if appl.Location == "" {
+			appl.Location = c.Session.Location
 		}
-		appl = storage.NewApplication(appl.OfferId, c.Session.Id, appl.Resume, appl.CoverLetter, appl.EmployeeLocation, &appl.Anwsers)
+		appl = storage.NewApplication(appl.OfferId, c.Session.Id, appl.Resume, appl.CoverLetter, appl.Location, &appl.Anwsers)
 		if err := c.Storage.CreateApplication(appl); err != nil {
 			return err
 		}

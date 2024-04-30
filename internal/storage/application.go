@@ -6,27 +6,27 @@ import (
 )
 
 type Application struct {
-	Id               string            `json:"id"`
-	OfferId          string            `json:"offerId" bson:"offer_id"`
-	EmployeeLocation string            `json:"employeeLocation" bson:"employee_location"`
-	EmployeeId       string            `json:"employeeId" bson:"employee_id"`
-	AppliedTime      int64             `json:"appliedTime" bson:"applied_time"`
-	Resume           string            `json:"resume"`
-	Anwsers          map[string]string `json:"answers"`
-	CoverLetter      string            `json:"coverLetter" bson:"cover_letter"`
+	Id          string            `json:"id"`
+	OfferId     string            `json:"offerId" bson:"offer_id"`
+	Location    string            `json:"employeeLocation" bson:"employee_location"`
+	EmployeeId  string            `json:"employeeId" bson:"employee_id"`
+	AppliedTime int64             `json:"appliedTime" bson:"applied_time"`
+	Resume      string            `json:"resume"`
+	Anwsers     map[string]string `json:"answers"`
+	CoverLetter string            `json:"coverLetter" bson:"cover_letter"`
 }
 
 func NewApplication(offerId, employeeId, resume, coverLetter, employeeLocation string, answers *map[string]string) *Application {
 	now := time.Now().Unix()
 	return &Application{
-		Id:               fmt.Sprintf("%s%d%s", employeeId[:8], now, employeeId[len(employeeId)-4:]),
-		OfferId:          offerId,
-		EmployeeId:       employeeId,
-		Resume:           resume,
-		CoverLetter:      coverLetter,
-		AppliedTime:      now,
-		EmployeeLocation: employeeLocation,
-		Anwsers:          *answers,
+		Id:          fmt.Sprintf("%s%d%s", employeeId[:8], now, employeeId[len(employeeId)-4:]),
+		OfferId:     offerId,
+		EmployeeId:  employeeId,
+		Resume:      resume,
+		CoverLetter: coverLetter,
+		AppliedTime: now,
+		Location:    employeeLocation,
+		Anwsers:     *answers,
 	}
 }
 func (a *Application) ParseUpdateFields() (*map[string]string, *[]string) {
